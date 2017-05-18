@@ -1,0 +1,50 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="x-ua-compatible" content="ie=edge">
+    <title>Radio Objects</title>
+    <meta name="description" content="">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="css/radio.css">
+  </head>
+  <body>
+      <div id="radio1Container" class="radio-container">
+        <div class="chunk">
+            <label>Current Station:</label>
+            <div class="8bit-text">FM 97.9</div>
+        </div>
+        <div class="chunk">
+            <label>Current Volume:</label>
+            <div class="8bit-text">8</div>
+        </div>
+        <div class="chunk">
+            <label>Volume:</label>
+            <button class="volume-btn">Up</button>
+            <button class="volume-btn">Down</button>
+        </div>
+        <div class="chunk">
+            <label>Tune:</label>
+            <button class="volume-btn">Up</button>
+            <button class="volume-btn">Down</button>
+        </div>
+
+        <div class="chunk">
+            <label>Favorites:</label>
+            <div class="presets">
+                <button class="preset" data-num="1">1</button>
+                <button class="preset" data-num="2">2</button>
+                <button class="preset" data-num="3">3</button>
+                <button class="preset" data-num="4">4</button>
+                <button class="preset" data-num="5">5</button>
+                <button class="preset" data-num="6">6</button>
+            </div>
+        </div>
+      </div>
+      <div id="radio2Container" class="radio-container"></div>
+      <div id="radio3Container" class="radio-container"></div>
+      <script src="js/jquery-3.2.1.min.js"></script>
+      <script src="js/radio.js"></script>
+      <script src="js/main.js"></script>
+  </body>
+</html>

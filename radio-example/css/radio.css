@@ -1,0 +1,23 @@
+html {
+  font-family: Helvetica, sans-serif;
+}
+
+.radio-container {
+  border: 1px solid black;
+  width: 400px;
+  margin: 20px 0;
+  min-height: 200px;
+}
+
+.radio-container .chunk {
+  padding: 15px;
+}
+
+.radio-container label {
+  display: block;
+  text-transform: uppercase;
+  color: #666;
+  font-size: 12px;
+  font-weight: 600;
+  margin-bottom: 5px;
+}

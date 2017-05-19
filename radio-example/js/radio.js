@@ -10,6 +10,14 @@ class Radio {
       return null
     }
 
+    // set some constants
+    this.MIN_AM_FREQUENCY = 540
+    this.MAX_AM_FREQUENCY = 1600
+    this.AM_FREQUENCY_INTERVAL = 10
+    this.MIN_FM_FREQUENCY = 87.9
+    this.MAX_FM_FREQUENCY = 107.9
+    this.FM_FREQUENCY_INTERVAL = 0.2
+
     // save references to DOM things
     this._el = el
     this._elId = elementId
@@ -20,7 +28,9 @@ class Radio {
     // add DOM events
     this._addEvents()
 
-    // set any initial radio state
+    // set the initial radio state
+    this.setVolume(5)
+    this.setFrequency('FM', 94.5) // The Buzz
   }
 
   // ---------------------------------------------------------------------------
@@ -47,11 +57,20 @@ class Radio {
   }
 
   getVolume () {
-
+    return this._volume
   }
 
   setVolume (newVolume) {
+    // make sure newVolume is an integer
+    newVolume = parseInt(newVolume, 10)
 
+    // make sure newVolume is a valid value
+    if (newVolume < 0 || newVolume > 10) return
+
+    this._volume = newVolume
+    this._renderVolume()
+
+    return newVolume
   }
 
   // alias for getFrequency and setFrequency
@@ -67,24 +86,70 @@ class Radio {
 
   }
 
-  setFrequency (band, newFrequency) {
+  setFrequency (newBand, newFrequency) {
+    // validate their band
+    newBand = newBand + ''
+    newBand = newBand.toUpperCase()
+    if (newBand !== 'FM' && newBand !== 'AM') return
 
+    // validate their frequency
+    newFrequency = parseFloat(newFrequency)
+    if (newBand === 'AM' && !this._validAMFrequency(newFrequency)) return
+    if (newBand === 'FM' && !this._validFMFrequency(newFrequency)) return
+
+    this._band = newBand
+    this._frequency = newFrequency
+    this._renderFrequency()
   }
 
   turnUp () {
-    console.log(this._elId + ': turn it up for what!')
+    let currentVolume = this._volume
+    if (currentVolume === 10) return
+    this.setVolume(currentVolume + 1)
   }
 
   turnDown () {
-    console.log(this._elId + ': turn it down you kids :(')
+    let currentVolume = this._volume
+    if (currentVolume === 0) return
+    this.setVolume(currentVolume - 1)
   }
 
   tuneUp () {
-    console.log(this._elId + ': TUNE UP!')
+    let currentBand = this._band
+    let currentFrequency = this._frequency
+
+    if (currentBand === 'AM' && currentFrequency === this.MAX_AM_FREQUENCY) {
+      this.setFrequency('AM', this.MIN_AM_FREQUENCY)
+    } else if (currentBand === 'AM') {
+      let newFrequency = currentFrequency + this.AM_FREQUENCY_INTERVAL
+      newFrequency = parseFloat(newFrequency.toFixed(1))
+      this.setFrequency('AM', newFrequency)
+    } else if (currentBand === 'FM' && currentFrequency === this.MAX_FM_FREQUENCY) {
+      this.setFrequency('FM', this.MIN_FM_FREQUENCY)
+    } else {
+      let newFrequency = currentFrequency + this.FM_FREQUENCY_INTERVAL
+      newFrequency = parseFloat(newFrequency.toFixed(1))
+      this.setFrequency('FM', newFrequency)
+    }
   }
 
   tuneDown () {
-    console.log(this._elId + ': TUNE DOWN')
+    let currentBand = this._band
+    let currentFrequency = this._frequency
+
+    if (currentBand === 'AM' && currentFrequency === this.MIN_AM_FREQUENCY) {
+      this.setFrequency('AM', this.MAX_AM_FREQUENCY)
+    } else if (currentBand === 'AM') {
+      let newFrequency = currentFrequency - this.AM_FREQUENCY_INTERVAL
+      newFrequency = parseFloat(newFrequency.toFixed(1))
+      this.setFrequency('AM', newFrequency)
+    } else if (currentBand === 'FM' && currentFrequency === this.MIN_FM_FREQUENCY) {
+      this.setFrequency('FM', this.MAX_FM_FREQUENCY)
+    } else {
+      let newFrequency = currentFrequency - this.FM_FREQUENCY_INTERVAL
+      newFrequency = parseFloat(newFrequency.toFixed(1))
+      this.setFrequency('FM', newFrequency)
+    }
   }
 
   selectFavorite (favNum) {
@@ -114,6 +179,14 @@ class Radio {
     })
   }
 
+  _renderVolume () {
+    $('#' + this._elId + ' .volume-display').html(this._volume)
+  }
+
+  _renderFrequency () {
+    $('#' + this._elId + ' .frequency-display').html(this._band + ' ' + this._frequency)
+  }
+
   _buildHTML () {
     return htmlStation() +
            htmlCurrentVolume() +
@@ -124,14 +197,14 @@ class Radio {
     function htmlStation() {
       return `<div class="chunk">
                   <label>Current Station:</label>
-                  <div class="8bit-text">FM 97.9</div>
+                  <div class="frequency-display 8bit-text"></div>
               </div>`
     }
 
     function htmlCurrentVolume() {
       return `<div class="chunk">
                  <label>Current Volume:</label>
-                 <div class="8bit-text">8</div>
+                 <div class="volume-display 8bit-text"></div>
               </div>`
     }
 
@@ -164,6 +237,20 @@ class Radio {
                   </div>
               </div>`
     }
+  }
+
+  _validAMFrequency (f) {
+    return typeof f === 'number' &&
+           f >= this.MIN_AM_FREQUENCY &&
+           f <= this.MAX_AM_FREQUENCY &&
+           f % this.AM_FREQUENCY_INTERVAL === 0
+  }
+
+  _validFMFrequency (f) {
+    // TODO: validate the odd number
+    return typeof f === 'number' &&
+           f >= this.MIN_FM_FREQUENCY &&
+           f <= this.MAX_FM_FREQUENCY
   }
 
 } // end class Radio

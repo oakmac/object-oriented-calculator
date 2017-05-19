@@ -72,3 +72,7 @@ calculator5.press('2')
 calculator5.press('+')
 calculator5.press('7')
 console.assert(calculator5.toString() === '3.2 + 7')
+
+// TODO:
+// - write .press() methods and then console.assert their .value()
+// - setInterval lock/unlock a calculator every 1 seconds

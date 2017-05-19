@@ -35,12 +35,11 @@ radio1.tuneDown() // goes to the next lowest frequency
 // radio1.frequency('fm', 98.8) // FM stations cannot be even
 radio1.frequency('am', 100) // out of range - does nothing
 
-/*
 // 6 preset stations
 radio1.getFavorites() // returns an array of the favorites
 radio1.setFavorite(1) // sets the current station as "Favorite 1"
+radio1.setFavorite(5)
 radio1.setFavorite(22) // does nothing - there are only 6 favorite buttons
 
 radio1.selectFavorite(1) // tune the radio to favorite 1
 radio1.selectFavorite(4) // tune the radio to favorite 4
-*/

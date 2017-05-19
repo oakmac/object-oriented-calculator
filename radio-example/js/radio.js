@@ -11,9 +11,13 @@ class Radio {
     }
 
     // set some constants
+    this.HOLD_TIME_MS = 2000
+    this.NUM_FAVORITES = 6
+
     this.MIN_AM_FREQUENCY = 540
     this.MAX_AM_FREQUENCY = 1600
     this.AM_FREQUENCY_INTERVAL = 10
+
     this.MIN_FM_FREQUENCY = 87.9
     this.MAX_FM_FREQUENCY = 107.9
     this.FM_FREQUENCY_INTERVAL = 0.2
@@ -27,6 +31,12 @@ class Radio {
 
     // add DOM events
     this._addEvents()
+
+    // set initial favorites
+    this._favorites = []
+    for (let i = 0; i < this.NUM_FAVORITES; i++) {
+      this._favorites.push({band: 'FM', frequency: this.MIN_FM_FREQUENCY})
+    }
 
     // set the initial radio state
     this.setVolume(5)
@@ -68,7 +78,7 @@ class Radio {
     if (newVolume < 0 || newVolume > 10) return
 
     this._volume = newVolume
-    this._renderVolume()
+    this._render()
 
     return newVolume
   }
@@ -83,7 +93,7 @@ class Radio {
   }
 
   getFrequency () {
-
+    return {band: this._band, frequency: this._frequency}
   }
 
   setFrequency (newBand, newFrequency) {
@@ -99,7 +109,7 @@ class Radio {
 
     this._band = newBand
     this._frequency = newFrequency
-    this._renderFrequency()
+    this._render()
   }
 
   turnUp () {
@@ -153,7 +163,27 @@ class Radio {
   }
 
   selectFavorite (favNum) {
-    console.log(this._elId + ': favorite ' + favNum)
+    // TODO: make sure favNum is valid
+    var favIdx = favNum - 1
+    let favBand = this._favorites[favIdx].band
+    let favFrequency = this._favorites[favIdx].frequency
+    this.setFrequency(favBand, favFrequency)
+  }
+
+  setFavorite (num) {
+    num = parseInt(num, 10)
+    if (num < 1 || num > this.NUM_FAVORITES) return
+
+    let currentBand = this._band
+    let currentFrequency = this._frequency
+    let favIdx = num - 1
+    this._favorites[favIdx] = {band: currentBand, frequency: currentFrequency}
+
+    this._render()
+  }
+
+  getFavorites () {
+    return this._favorites
   }
 
   // ---------------------------------------------------------------------------
@@ -177,6 +207,27 @@ class Radio {
       let presetNumber = evt.target.dataset.num
       that.selectFavorite(presetNumber)
     })
+    $('#' + id + ' .preset-btn').on('mousedown', function (evt) {
+      let presetNumber = evt.target.dataset.num
+      that._presetMousedownBtnNum = presetNumber
+      that._areWePressingDown = true
+
+      window.setTimeout(function () {
+        if (that._areWePressingDown && that._presetMousedownBtnNum === presetNumber) {
+          that.setFavorite(presetNumber)
+        }
+      }, that.HOLD_TIME_MS)
+    })
+    $('#' + id + ' .preset-btn').on('mouseup', function (evt) {
+      that._areWePressingDown = false
+      that._presetMousedownBtnNum = null
+    })
+  }
+
+  _render () {
+    this._renderVolume()
+    this._renderFrequency()
+    this._renderFavorites()
   }
 
   _renderVolume () {
@@ -185,6 +236,26 @@ class Radio {
 
   _renderFrequency () {
     $('#' + this._elId + ' .frequency-display').html(this._band + ' ' + this._frequency)
+  }
+
+  _renderFavorites () {
+    let id = this._elId
+    let currentBand = this._band
+    let currentFrequency = this._frequency
+
+    for (let i = 0; i < this.NUM_FAVORITES; i++) {
+      let favBand = this._favorites[i].band
+      let favFrequency = this._favorites[i].frequency
+
+      // highlight the button
+      if (currentBand === favBand && currentFrequency === favFrequency) {
+        $('#' + id + ' .fav-btn-' + (i + 1)).addClass('active')
+      } else {
+        // remove button highlight
+        $('#' + id + ' .fav-btn-' + (i + 1)).removeClass('active')
+      }
+      // TODO: clear the timeout on mouseleave button event
+    }
   }
 
   _buildHTML () {
@@ -228,12 +299,12 @@ class Radio {
       return `<div class="chunk">
                   <label>Favorites:</label>
                   <div class="presets">
-                      <button class="preset-btn" data-num="1">1</button>
-                      <button class="preset-btn" data-num="2">2</button>
-                      <button class="preset-btn" data-num="3">3</button>
-                      <button class="preset-btn" data-num="4">4</button>
-                      <button class="preset-btn" data-num="5">5</button>
-                      <button class="preset-btn" data-num="6">6</button>
+                      <button class="preset-btn fav-btn-1" data-num="1">1</button>
+                      <button class="preset-btn fav-btn-2" data-num="2">2</button>
+                      <button class="preset-btn fav-btn-3" data-num="3">3</button>
+                      <button class="preset-btn fav-btn-4" data-num="4">4</button>
+                      <button class="preset-btn fav-btn-5" data-num="5">5</button>
+                      <button class="preset-btn fav-btn-6" data-num="6">6</button>
                   </div>
               </div>`
     }

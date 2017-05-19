@@ -10,7 +10,7 @@ html {
 }
 
 .radio-container .chunk {
-  padding: 15px;
+  padding: 10px;
 }
 
 .radio-container label {
@@ -20,4 +20,12 @@ html {
   font-size: 12px;
   font-weight: 600;
   margin-bottom: 5px;
+}
+
+.radio-container .preset-btn {
+  padding: 5px 10px;
+}
+
+.radio-container .preset-btn.active {
+  background: orange;
 }
